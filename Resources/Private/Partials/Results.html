@@ -11,7 +11,7 @@
     <div class="panel panel-default panel-a11y">
       <div class="panel-heading impact-{resultSet.impact}" role="tab" id="heading-{preset.id}-{i.index}">
         <h2 class="panel-title">
-          <a href="#resultset-{preset.id}-{i.index}" class="{f:if(condition: '{results -> f:count()} > 1', then: 'collapsed', else: '')}" data-toggle="collapse" aria-controls="#resultset-{i.index}">
+          <a href="#resultset-{preset.id}-{i.index}" class="{f:if(condition: '{results -> f:count()} > 1', then: 'collapsed', else: '')}" data-bs-toggle="collapse" aria-controls="#resultset-{i.index}">
             <span class="caret"></span>
             <strong>{resultSet.table} - {resultSet.uid}</strong>
           </a>

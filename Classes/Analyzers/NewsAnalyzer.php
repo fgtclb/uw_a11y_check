@@ -13,10 +13,7 @@ use UniWue\UwA11yCheck\Domain\Model\Dto\SingleTableDemand;
  */
 class NewsAnalyzer extends AbstractAnalyzer
 {
-    /**
-     * @var string
-     */
-    protected $type = AbstractAnalyzer::TYPE_INTERNAL;
+    protected string $type = AbstractAnalyzer::TYPE_INTERNAL;
 
     /**
      * Return an aray of news record Uids to check

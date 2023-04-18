@@ -15,13 +15,14 @@
         "GPL-2.0+"
     ],
     "require": {
+        "php": "^7.4 || ^8.0",
+        "ext-dom": "*",
         "typo3/cms-core": "^11.5",
         "symfony/dom-crawler": "^5.2",
         "symfony/css-selector": "^5.2",
         "symfony/serializer": "^5.2",
         "symfony/property-access": "^5.2",
-        "symfony/property-info": "^5.2",
-        "ext-dom": "*"
+        "symfony/property-info": "^5.2"
     },
     "replace": {
         "typo3-ter/uw-a11y-check": "self.version"

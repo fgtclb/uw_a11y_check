@@ -13,15 +13,9 @@ use UniWue\UwA11yCheck\Check\ResultSet;
  */
 class ResultsService
 {
-    /**
-     * @var SerializationService
-     */
-    protected $serializationService;
+    protected SerializationService $serializationService;
 
-    /**
-     * @var PresetService
-     */
-    protected $presetService;
+    protected PresetService $presetService;
 
     public function injectSerializationService(SerializationService $serializationService): void
     {

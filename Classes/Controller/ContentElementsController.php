@@ -34,7 +34,7 @@ class ContentElementsController extends ActionController
         $expectedHmac = GeneralUtility::hmac($hmacString, 'page_content');
 
         if ($expectedHmac !== $hmac) {
-            throw new Exception('HMAC does not match', 1_572_608_738_828);
+            throw new Exception('HMAC does not match', 1572608738828);
         }
 
         $whereCondition = 'colPos >= 0';

@@ -9,10 +9,7 @@ use UniWue\UwA11yCheck\Check\Preset;
  */
 class PageContentAnalyzer extends AbstractAnalyzer
 {
-    /**
-     * @var string
-     */
-    protected $type = AbstractAnalyzer::TYPE_INTERNAL;
+    protected string $type = AbstractAnalyzer::TYPE_INTERNAL;
 
     /**
      * Return an aray of page record Uids to check

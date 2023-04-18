@@ -12,9 +12,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class NewsDetail extends AbstractCheckUrlGenerator
 {
     /**
-     * @var array
+     * @var array[]
      */
-    protected $requiredConfiguration = ['targetPid'];
+    protected array $requiredConfiguration = ['targetPid'];
 
     /**
      * @var int

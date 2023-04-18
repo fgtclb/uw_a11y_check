@@ -18,7 +18,7 @@ abstract class AbstractAnalyzer implements AnalyzerInterface
 {
     final const TYPE_INTERNAL = 'internal';
 
-    protected string $type = '';
+    protected  string $type = '';
 
     /**
      * @var array

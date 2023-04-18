@@ -13,7 +13,7 @@ class Page extends AbstractCheckUrlGenerator
     /**
      * Page constructor.
      *
-     * @param array $configuration
+     * @param array[] $configuration
      */
     public function __construct(array $configuration)
     {

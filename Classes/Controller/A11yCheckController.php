@@ -17,7 +17,10 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use TYPO3\CMS\Fluid\View\TemplateView;
 use UniWue\UwA11yCheck\Domain\Model\Dto\CheckDemand;
 use UniWue\UwA11yCheck\Service\PresetService;
 use UniWue\UwA11yCheck\Service\ResultsService;
@@ -30,35 +33,29 @@ class A11yCheckController extends ActionController
     final const LANG_CORE = 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:';
     final const LANG_LOCAL = 'LLL:EXT:uw_a11y_check/Resources/Private/Language/locallang.xlf:';
 
+    protected PresetService $presetService;
+
+    private ModuleTemplateFactory $moduleTemplateFactory;
+
+
     /**
-     * @var PresetService
+     * The current page uid
      */
-    protected $presetService;
-    public function __construct(private ModuleTemplateFactory $moduleTemplateFactory)
+    protected int $pid = 0;
+
+    protected IconFactory $iconFactory;
+
+    protected ResultsService $resultsService;
+
+    public function __construct(ModuleTemplateFactory $moduleTemplateFactory)
     {
+        $this->moduleTemplateFactory = $moduleTemplateFactory;
     }
 
     public function injectPresetService(PresetService $presetService): void
     {
         $this->presetService = $presetService;
     }
-
-    /**
-     * The current page uid
-     *
-     * @var int
-     */
-    protected $pid = 0;
-
-    /**
-     * @var IconFactory
-     */
-    protected $iconFactory;
-
-    /**
-     * @var ResultsService
-     */
-    protected $resultsService;
 
     /**
      * Set up the doc header properly here
@@ -70,10 +67,10 @@ class A11yCheckController extends ActionController
         parent::initializeView($view);
 
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $this->resultsService = $this->objectManager->get(ResultsService::class);
+        $this->resultsService =GeneralUtility::makeInstance(ObjectManager::class)->get(ResultsService::class);
 
         $moduleTemplate->setFlashMessageQueue($this->controllerContext->getFlashMessageQueue());
-        if ($view instanceof BackendTemplateView) {
+        if ($view instanceof TemplateView) {
             $moduleTemplate->getPageRenderer()->addCssFile(
                 'EXT:uw_a11y_check/Resources/Public/Css/a11y_check.css'
             );
@@ -94,10 +91,9 @@ class A11yCheckController extends ActionController
     /**
      * Index action
      *
-     * @param CheckDemand $checkDemand
      * @IgnoreValidation("checkDemand")
      */
-    public function indexAction($checkDemand = null): ResponseInterface
+    public function indexAction(CheckDemand $checkDemand = null): ResponseInterface
     {
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         if ($checkDemand === null) {
@@ -115,7 +111,6 @@ class A11yCheckController extends ActionController
                 ]
             );
         }
-
         $this->view->assignMultiple([
             'checkDemand' => $checkDemand,
             'presets' => $this->presetService->getPresets(),
@@ -197,7 +192,7 @@ class A11yCheckController extends ActionController
     protected function createMenu(): void
     {
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
-        $uriBuilder = $this->objectManager->get(UriBuilder::class);
+        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $uriBuilder->setRequest($this->request);
 
         $menu = $moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
@@ -229,8 +224,8 @@ class A11yCheckController extends ActionController
         // Shortcut
         if ($this->getBackendUser()->mayMakeShortcut()) {
             $shortcutButton = $buttonBar->makeShortcutButton()
-                ->setModuleName('web_UwA11yCheckTxUwa11ycheckM1')
-                ->setGetVariables(['route', 'module', 'id'])
+                ->setRouteIdentifier('web_UwA11yCheckTxUwa11ycheckM1')
+                ->setArguments(['route', 'module', 'id'])
                 ->setDisplayName('Shortcut');
             $buttonBar->addButton($shortcutButton, ButtonBar::BUTTON_POSITION_RIGHT);
         }

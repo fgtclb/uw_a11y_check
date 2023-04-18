@@ -22,10 +22,7 @@ use UniWue\UwA11yCheck\Utility\Exception\ConfigurationFileNotFoundException;
  */
 class PresetService
 {
-    /**
-     * @var YamlFileLoader
-     */
-    protected $yamlFileLoader;
+    protected YamlFileLoader $yamlFileLoader;
 
     protected ObjectManager $objectManager;
 

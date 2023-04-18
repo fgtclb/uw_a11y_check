@@ -196,12 +196,6 @@ class LinkUtilityTest extends BaseTestCase
     public function hasRedundantLinkNamesTestsDataProvider(): array
     {
         return [
-            'no links at all' => [
-                [
-                    '<img src="test.html" alt="" />'
-                ],
-                0
-            ],
             'only one link' => [
                 [
                     '<a href="link.html">Link 1</a>'

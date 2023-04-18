@@ -13,15 +13,15 @@ use UniWue\UwA11yCheck\Utility\Tests\ElementUtility;
  */
 abstract class AbstractTest implements TestInterface
 {
-    protected string $id = '';
+    protected $id = '';
 
-    protected string $description = '';
+    protected $description = '';
 
-    protected string $help = '';
+    protected $help = '';
 
-    protected string $helpUrl = '';
+    protected $helpUrl = '';
 
-    protected int $impact = 0;
+    protected $impact = 0;
 
     public function getId(): string
     {

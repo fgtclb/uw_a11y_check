@@ -11,13 +11,17 @@ class SingleTableDemand extends AbstractEntity
 {
     /**
      * The tablename for the query
+     *
+     * @var int
      */
-    protected string $tableName = '';
+    protected $tableName = '';
 
     /**
      * Max results of records to return. Default is 50
+     *
+     * @var int
      */
-    protected int $maxResults = 50;
+    protected $maxResults = 50;
 
     public function getTableName(): string
     {

@@ -10,11 +10,20 @@ use UniWue\UwA11yCheck\Check\Preset;
  */
 class CheckDemand extends AbstractEntity
 {
-    protected string $analyze = '';
+    /**
+     * @var string
+     */
+    protected $analyze = '';
 
-    protected ?Preset $preset = null;
+    /**
+     * @var \UniWue\UwA11yCheck\Check\Preset|null
+     */
+    protected $preset = null;
 
-    protected int $level = 0;
+    /**
+     * @var int
+     */
+    protected $level = 0;
 
     public function getAnalyze(): string
     {

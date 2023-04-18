@@ -10,9 +10,9 @@ use UniWue\UwA11yCheck\Utility\Exception\MissingConfigurationException;
 abstract class AbstractCheckUrlGenerator
 {
     /**
-     * @var array
+     * @var array[]
      */
-    protected $requiredConfiguration = [];
+    protected array $requiredConfiguration = [];
 
     protected string $tableName = '';
 
