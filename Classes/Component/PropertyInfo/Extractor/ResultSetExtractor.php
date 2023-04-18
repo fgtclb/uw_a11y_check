@@ -14,7 +14,7 @@ use UniWue\UwA11yCheck\Check\ResultSet;
  */
 class ResultSetExtractor implements PropertyTypeExtractorInterface
 {
-    private ReflectionExtractor $reflectionExtractor;
+    private readonly ReflectionExtractor $reflectionExtractor;
 
     /**
      * ResultSetExtractor constructor.

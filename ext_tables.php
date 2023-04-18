@@ -2,7 +2,7 @@
 
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 use UniWue\UwA11yCheck\Controller\A11yCheckController;
-defined('TYPO3_MODE') || die();
+defined('TYPO3') || die();
 
 call_user_func(function (): void {
     if (TYPO3_MODE === 'BE') {

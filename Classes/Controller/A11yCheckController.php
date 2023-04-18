@@ -2,6 +2,7 @@
 
 namespace UniWue\UwA11yCheck\Controller;
 
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Annotation\IgnoreValidation;
 use Psr\Http\Message\ResponseInterface;
@@ -33,6 +34,9 @@ class A11yCheckController extends ActionController
      * @var PresetService
      */
     protected $presetService;
+    public function __construct(private ModuleTemplateFactory $moduleTemplateFactory)
+    {
+    }
 
     public function injectPresetService(PresetService $presetService): void
     {
@@ -40,25 +44,11 @@ class A11yCheckController extends ActionController
     }
 
     /**
-     * Backend Template Container
-     *
-     * @var string
-     */
-    protected $defaultViewObjectName = BackendTemplateView::class;
-
-    /**
      * The current page uid
      *
      * @var int
      */
     protected $pid = 0;
-
-    /**
-     * BackendTemplateContainer
-     *
-     * @var BackendTemplateView
-     */
-    protected $view;
 
     /**
      * @var IconFactory
@@ -75,15 +65,16 @@ class A11yCheckController extends ActionController
      */
     protected function initializeView(ViewInterface $view): void
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         /** @var BackendTemplateView $view */
         parent::initializeView($view);
 
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $this->resultsService = $this->objectManager->get(ResultsService::class);
 
-        $this->view->getModuleTemplate()->setFlashMessageQueue($this->controllerContext->getFlashMessageQueue());
+        $moduleTemplate->setFlashMessageQueue($this->controllerContext->getFlashMessageQueue());
         if ($view instanceof BackendTemplateView) {
-            $view->getModuleTemplate()->getPageRenderer()->addCssFile(
+            $moduleTemplate->getPageRenderer()->addCssFile(
                 'EXT:uw_a11y_check/Resources/Public/Css/a11y_check.css'
             );
         }
@@ -106,8 +97,9 @@ class A11yCheckController extends ActionController
      * @param CheckDemand $checkDemand
      * @IgnoreValidation("checkDemand")
      */
-    public function indexAction($checkDemand = null): void
+    public function indexAction($checkDemand = null): ResponseInterface
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         if ($checkDemand === null) {
             $checkDemand = new CheckDemand();
         }
@@ -130,6 +122,8 @@ class A11yCheckController extends ActionController
             'levelSelectorOptions' => $this->getLevelSelectorOptions(),
             'savedResultsCount' => $this->resultsService->getSavedResultsCount($this->pid),
         ]);
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
@@ -156,6 +150,7 @@ class A11yCheckController extends ActionController
      */
     public function checkAction(CheckDemand $checkDemand): ResponseInterface
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $preset = $checkDemand->getPreset();
         $results = $preset->executeTestSuiteByPageUid($this->pid, $checkDemand->getLevel());
 
@@ -164,7 +159,8 @@ class A11yCheckController extends ActionController
             'results' => $results,
             'date' => new DateTime()
         ]);
-        return $this->htmlResponse();
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
@@ -172,22 +168,27 @@ class A11yCheckController extends ActionController
      */
     public function resultsAction(): ResponseInterface
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $this->createAcknowledgeButton($this->pid);
         $resultsArray = $this->resultsService->getResultsArrayByPid($this->pid);
 
         $this->view->assignMultiple([
             'resultsArray' => $resultsArray
         ]);
-        return $this->htmlResponse();
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
      * AcknowledgeResult Action
      */
-    public function acknowledgeResultAction(int $pageUid): void
+    public function acknowledgeResultAction(int $pageUid): ResponseInterface
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $this->resultsService->deleteSavedResults($pageUid);
         $this->redirect('index');
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
@@ -195,10 +196,11 @@ class A11yCheckController extends ActionController
      */
     protected function createMenu(): void
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $uriBuilder = $this->objectManager->get(UriBuilder::class);
         $uriBuilder->setRequest($this->request);
 
-        $menu = $this->view->getModuleTemplate()->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
+        $menu = $moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
         $menu->setIdentifier('uw_a11y_check');
 
         $actions = ['index', 'results'];
@@ -212,7 +214,7 @@ class A11yCheckController extends ActionController
         }
 
         if ($menu instanceof Menu) {
-            $this->view->getModuleTemplate()->getDocHeaderComponent()->getMenuRegistry()->addMenu($menu);
+            $moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->addMenu($menu);
         }
     }
 
@@ -221,7 +223,8 @@ class A11yCheckController extends ActionController
      */
     protected function createDefaultButtons(): void
     {
-        $buttonBar = $this->view->getModuleTemplate()->getDocHeaderComponent()->getButtonBar();
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
+        $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
         // Shortcut
         if ($this->getBackendUser()->mayMakeShortcut()) {
@@ -238,10 +241,11 @@ class A11yCheckController extends ActionController
      */
     protected function createAcknowledgeButton(int $pid): void
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $uriBuilder = $this->objectManager->get(UriBuilder::class);
         $uriBuilder->setRequest($this->request);
 
-        $buttonBar = $this->view->getModuleTemplate()->getDocHeaderComponent()->getButtonBar();
+        $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
         $title = $this->getLanguageService()->sL(self::LANG_LOCAL . 'labels.acknowledgeResults');
         $button = $buttonBar->makeLinkButton();

@@ -5,7 +5,7 @@ use UniWue\UwA11yCheck\Controller\ContentElementsController;
 use UniWue\UwA11yCheck\Property\TypeConverter\PresetTypeConverter;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-defined('TYPO3_MODE') || die();
+defined('TYPO3') || die();
 
 call_user_func(function (): void {
     ExtensionUtility::configurePlugin(
