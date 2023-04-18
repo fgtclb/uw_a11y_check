@@ -10,73 +10,46 @@ use UniWue\UwA11yCheck\Check\Preset;
  */
 class CheckDemand extends AbstractEntity
 {
-    /**
-     * @var string
-     */
-    protected $analyze = '';
+    protected string $analyze = '';
 
-    /**
-     * @var \UniWue\UwA11yCheck\Check\Preset|null
-     */
-    protected $preset;
+    protected ?Preset $preset = null;
 
-    /**
-     * @var int
-     */
-    protected $level = 0;
+    protected int $level = 0;
 
-    /**
-     * @return string
-     */
     public function getAnalyze(): string
     {
         return $this->analyze;
     }
 
-    /**
-     * @param string $analyze
-     */
     public function setAnalyze(string $analyze): void
     {
         $this->analyze = $analyze;
     }
 
-    /**
-     * @return \UniWue\UwA11yCheck\Check\Preset|null
-     */
     public function getPreset(): ?Preset
     {
         return $this->preset;
     }
 
-    /**
-     * @param \UniWue\UwA11yCheck\Check\Preset|null $preset
-     */
     public function setPreset(?Preset $preset): void
     {
         $this->preset = $preset;
     }
 
-    /**
-     * @return int
-     */
     public function getLevel(): int
     {
         return $this->level;
     }
 
-    /**
-     * @param int $level
-     */
     public function setLevel(int $level): void
     {
         $this->level = $level;
     }
 
     /**
-     * @return array
+     * @return array{analyze: string, preset: string, level: int}
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'analyze' => $this->getAnalyze(),

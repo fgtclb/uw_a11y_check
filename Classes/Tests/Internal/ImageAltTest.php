@@ -2,6 +2,10 @@
 
 namespace UniWue\UwA11yCheck\Tests\Internal;
 
+use UniWue\UwA11yCheck\Check\Result\Impact;
+use DOMElement;
+use UniWue\UwA11yCheck\Check\Result\Node;
+use UniWue\UwA11yCheck\Check\Result\Status;
 use Symfony\Component\DomCrawler\Crawler;
 use UniWue\UwA11yCheck\Check\Result;
 use UniWue\UwA11yCheck\Tests\AbstractTest;
@@ -25,14 +29,10 @@ class ImageAltTest extends AbstractTest
     /**
      * @var int
      */
-    protected $impact = Result\Impact::CRITICAL;
+    protected $impact = Impact::CRITICAL;
 
     /**
      * Runs the test
-     *
-     * @param string $html
-     * @param int $fallbackElementUid
-     * @return Result
      */
     public function run(string $html, int $fallbackElementUid): Result
     {
@@ -41,7 +41,7 @@ class ImageAltTest extends AbstractTest
         $crawler = new Crawler($html);
         $images = $crawler->filter('img');
 
-        /** @var \DOMElement $image */
+        /** @var DOMElement $image */
         foreach ($images as $image) {
             $checkResult = SharedUtility::elementHasAlt($image) ||
                 SharedUtility::elementHasAriaLabelValue($image) ||
@@ -50,17 +50,17 @@ class ImageAltTest extends AbstractTest
                 SharedUtility::elementHasRoleNone($image);
 
             if (!$checkResult) {
-                $node = new Result\Node();
+                $node = new Node();
                 $node->setHtml($image->ownerDocument->saveHTML($image));
                 $node->setUid($this->getElementUid($image, $fallbackElementUid));
                 $result->addNode($node);
-                $result->setStatus(Result\Status::VIOLATIONS);
+                $result->setStatus(Status::VIOLATIONS);
             }
         }
 
         // If all found nodes passed, set status to passes
-        if ($images->count() > 0 && count($result->getNodes()) === 0) {
-            $result->setStatus(Result\Status::PASSES);
+        if ($images->count() > 0 && $result->getNodes() === []) {
+            $result->setStatus(Status::PASSES);
         }
 
         return $result;

@@ -14,43 +14,27 @@ abstract class AbstractCheckUrlGenerator
      */
     protected $requiredConfiguration = [];
 
-    /**
-     * @var string
-     */
-    protected $tableName = '';
+    protected string $tableName = '';
 
-    /**
-     * @var string
-     */
-    protected $editRecordTable = '';
+    protected string $editRecordTable = '';
 
     /**
      * AbstractCheckUrlGenerator constructor.
-     * @param array $configuration
      */
     public function __construct(array $configuration)
     {
         $this->checkRequiredConfiguration($configuration);
     }
 
-    /**
-     * @param int $pageUid
-     */
     public function getCheckUrl(int $pageUid): string
     {
     }
 
-    /**
-     * @return string
-     */
     public function getTableName(): string
     {
         return $this->tableName;
     }
 
-    /**
-     * @return string
-     */
     public function getEditRecordTable(): string
     {
         return $this->editRecordTable;
@@ -58,16 +42,14 @@ abstract class AbstractCheckUrlGenerator
 
     /**
      * Checks, if all required configuration settings are available and if not, throws an exception
-     *
-     * @param array $configuration
      */
     protected function checkRequiredConfiguration(array $configuration)
     {
         foreach ($this->requiredConfiguration as $configurationKey) {
             if (!isset($configuration[$configurationKey])) {
                 throw new MissingConfigurationException(
-                    'Missing configuration key "' . $configurationKey . '" in ' . __CLASS__,
-                    1573565583355
+                    'Missing configuration key "' . $configurationKey . '" in ' . self::class,
+                    1_573_565_583_355
                 );
             }
         }

@@ -21,10 +21,7 @@ class PageContent extends AbstractCheckUrlGenerator
      */
     protected $targetPid = 0;
 
-    /**
-     * @var array
-     */
-    protected $ignoredContentTypes = [];
+    protected array $ignoredContentTypes = [];
 
     /**
      * PageContent constructor.
@@ -47,7 +44,6 @@ class PageContent extends AbstractCheckUrlGenerator
     /**
      * Returns the check URL
      *
-     * @param int $pageUid
      * @return string|void
      */
     public function getCheckUrl(int $pageUid): string

@@ -14,26 +14,23 @@ class TestSuite
      */
     protected $tests = [];
 
-    /**
-     * @param TestInterface $test
-     */
-    public function addTest(TestInterface $test)
+    public function addTest(TestInterface $test): void
     {
         $this->tests[] = $test;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getTests()
+    public function getTests(): array
     {
         return $this->tests;
     }
 
     /**
-     * @param array $tests
+     * @param mixed[] $tests
      */
-    public function setTests(array $tests)
+    public function setTests(array $tests): void
     {
         $this->tests = $tests;
     }

@@ -17,8 +17,7 @@ class PageContentAnalyzer extends AbstractAnalyzer
     /**
      * Return an aray of page record Uids to check
      *
-     * @param Preset $preset
-     * @return array
+     * @return mixed[]
      */
     public function getCheckRecordUids(Preset $preset): array
     {

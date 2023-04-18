@@ -2,6 +2,10 @@
 
 namespace UniWue\UwA11yCheck\Tests\Internal;
 
+use UniWue\UwA11yCheck\Check\Result\Impact;
+use DOMElement;
+use UniWue\UwA11yCheck\Check\Result\Node;
+use UniWue\UwA11yCheck\Check\Result\Status;
 use Symfony\Component\DomCrawler\Crawler;
 use UniWue\UwA11yCheck\Check\Result;
 use UniWue\UwA11yCheck\Tests\AbstractTest;
@@ -20,14 +24,10 @@ class RedundantTitleTest extends AbstractTest
     /**
      * @var int
      */
-    protected $impact = Result\Impact::MINOR;
+    protected $impact = Impact::MINOR;
 
     /**
      * Runs the test
-     *
-     * @param string $html
-     * @param int $fallbackElementUid
-     * @return Result
      */
     public function run(string $html, int $fallbackElementUid): Result
     {
@@ -36,22 +36,22 @@ class RedundantTitleTest extends AbstractTest
         $crawler = new Crawler($html);
         $elements = $crawler->filter('a, img');
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         foreach ($elements as $element) {
             $checkResult = SharedUtility::elementTitleNotRedundant($element);
 
             if (!$checkResult) {
-                $node = new Result\Node();
+                $node = new Node();
                 $node->setHtml($element->ownerDocument->saveHTML($element));
                 $node->setUid($this->getElementUid($element, $fallbackElementUid));
                 $result->addNode($node);
-                $result->setStatus(Result\Status::VIOLATIONS);
+                $result->setStatus(Status::VIOLATIONS);
             }
         }
 
         // If all found nodes passed, set status to passes
-        if ($elements->count() > 0 && count($result->getNodes()) === 0) {
-            $result->setStatus(Result\Status::PASSES);
+        if ($elements->count() > 0 && $result->getNodes() === []) {
+            $result->setStatus(Status::PASSES);
         }
 
         return $result;

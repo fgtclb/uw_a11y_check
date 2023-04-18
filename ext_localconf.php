@@ -1,23 +1,28 @@
 <?php
 
-defined('TYPO3_MODE') or die();
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+use UniWue\UwA11yCheck\Controller\ContentElementsController;
+use UniWue\UwA11yCheck\Property\TypeConverter\PresetTypeConverter;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+defined('TYPO3_MODE') || die();
 
-call_user_func(function () {
-    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+call_user_func(function (): void {
+    ExtensionUtility::configurePlugin(
         'uw_a11y_check',
         'Pi1',
         [
-            \UniWue\UwA11yCheck\Controller\ContentElementsController::class => 'show',
+            ContentElementsController::class => 'show',
         ],
         // non-cacheable actions
         [
-            \UniWue\UwA11yCheck\Controller\ContentElementsController::class => 'show',
+            ContentElementsController::class => 'show',
         ]
     );
 
     if (TYPO3_MODE === 'BE') {
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerTypeConverter(
-            \UniWue\UwA11yCheck\Property\TypeConverter\PresetTypeConverter::class
+        ExtensionUtility::registerTypeConverter(
+            PresetTypeConverter::class
         );
     }
 
@@ -27,8 +32,8 @@ call_user_func(function () {
             'EXT:uw_a11y_check/Configuration/A11y/Default.yaml';
     }
 
-    if (!\TYPO3\CMS\Core\Core\Environment::isComposerMode()) {
-        $composerAutoloadFile = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('uw_a11y_check')
+    if (!Environment::isComposerMode()) {
+        $composerAutoloadFile = ExtensionManagementUtility::extPath('uw_a11y_check')
             . 'Resources/Private/Php/vendor/autoload.php';
         require_once($composerAutoloadFile);
     }

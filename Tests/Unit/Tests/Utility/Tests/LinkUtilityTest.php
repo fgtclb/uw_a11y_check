@@ -8,7 +8,7 @@ namespace UniWue\UwA11yCheck\Tests\Unit\Tests\Internal;
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  */
-
+use DOMElement;
 use DOMDocument;
 use TYPO3\TestingFramework\Core\BaseTestCase;
 use UniWue\UwA11yCheck\Utility\Tests\LinkUtility;
@@ -19,9 +19,9 @@ use UniWue\UwA11yCheck\Utility\Tests\LinkUtility;
 class LinkUtilityTest extends BaseTestCase
 {
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function linkHasImageWithAltTestsDataProvider()
+    public function linkHasImageWithAltTestsDataProvider(): array
     {
         return [
             'link with no image' => [
@@ -53,12 +53,12 @@ class LinkUtilityTest extends BaseTestCase
      * @param $html
      * @param $expected
      */
-    public function linkHasImageWithAltTests($html, $expected)
+    public function linkHasImageWithAltTests(string $html, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('a')->item(0);
         $result = LinkUtility::linkHasImageWithAlt($element);
 
@@ -66,9 +66,9 @@ class LinkUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, mixed[]>
      */
-    public function linkTextNotBlacklistedTestsDataProvider()
+    public function linkTextNotBlacklistedTestsDataProvider(): array
     {
         return [
             'text not blacklisted' => [
@@ -110,13 +110,14 @@ class LinkUtilityTest extends BaseTestCase
      * @param $html
      * @param $blacklist
      * @param $expected
+     * @param string[]|mixed[] $blacklist
      */
-    public function linkTextNotBlacklistedTests($html, $blacklist, $expected)
+    public function linkTextNotBlacklistedTests(string $html, array $blacklist, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('a')->item(0);
         $result = LinkUtility::linkTextNotBlacklisted($element, $blacklist);
 
@@ -124,9 +125,9 @@ class LinkUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, mixed[]>
      */
-    public function linkImageAttributeNotBlacklistedTestsDataProvider()
+    public function linkImageAttributeNotBlacklistedTestsDataProvider(): array
     {
         return [
             'no blacklist' => [
@@ -175,13 +176,14 @@ class LinkUtilityTest extends BaseTestCase
      * @param $attribute
      * @param $blacklist
      * @param $expected
+     * @param mixed[]|string[] $blacklist
      */
-    public function linkImageAttributeNotBlacklistedTests($html, $attribute, $blacklist, $expected)
+    public function linkImageAttributeNotBlacklistedTests(string $html, string $attribute, array $blacklist, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('a')->item(0);
         $result = LinkUtility::linkImageAttributeNotBlacklisted($element, $attribute, $blacklist);
 
@@ -189,9 +191,9 @@ class LinkUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<string[]|int>>
      */
-    public function hasRedundantLinkNamesTestsDataProvider()
+    public function hasRedundantLinkNamesTestsDataProvider(): array
     {
         return [
             'no links at all' => [
@@ -236,8 +238,9 @@ class LinkUtilityTest extends BaseTestCase
      * @dataProvider hasRedundantLinkNamesTestsDataProvider
      * @param $html
      * @param $expected
+     * @param string[] $htmlArray
      */
-    public function hasRedundantLinkNamesTests($htmlArray, $expected)
+    public function hasRedundantLinkNamesTests(array $htmlArray, int $expected): void
     {
         $elements = [];
 
@@ -248,7 +251,7 @@ class LinkUtilityTest extends BaseTestCase
             $elements[] = $element;
         }
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $result = LinkUtility::getRedundantLinkNames($elements);
 
         self::assertEquals($expected, count($result));

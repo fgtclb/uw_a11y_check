@@ -2,6 +2,8 @@
 
 namespace UniWue\UwA11yCheck\Service;
 
+use Exception;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
@@ -25,15 +27,9 @@ class PresetService
      */
     protected $yamlFileLoader;
 
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
+    protected ObjectManager $objectManager;
 
-    /**
-     * @var FlashMessageService
-     */
-    protected $flashMessageService;
+    protected FlashMessageService $flashMessageService;
 
     /**
      * PresetService constructor.
@@ -44,10 +40,7 @@ class PresetService
         $this->flashMessageService = $this->objectManager->get(FlashMessageService::class);
     }
 
-    /**
-     * @param YamlFileLoader $yamlFileLoader
-     */
-    public function injectYamlFileLoader(YamlFileLoader $yamlFileLoader)
+    public function injectYamlFileLoader(YamlFileLoader $yamlFileLoader): void
     {
         $this->yamlFileLoader = $yamlFileLoader;
     }
@@ -55,7 +48,7 @@ class PresetService
     /**
      * Returns all presets
      *
-     * @return array
+     * @return Preset[]
      */
     public function getPresets(): array
     {
@@ -87,11 +80,11 @@ class PresetService
                 $configuration = $presetData['configuration'] ?? [];
 
                 $presets[] = new Preset($id, $name, $analyzer, $checkUrlGenerator, $testSuite, $configuration);
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $message = new FlashMessage(
                     $exception->getMessage(),
                     'Class not found in preset "' . $name . '"',
-                    FlashMessage::ERROR,
+                    AbstractMessage::ERROR,
                     true
                 );
                 // @extensionScannerIgnoreLine False positive
@@ -106,9 +99,6 @@ class PresetService
 
     /**
      * Returns a preset by the ID
-     *
-     * @param string $id
-     * @return Preset|null
      */
     public function getPresetById(string $id): ?Preset
     {
@@ -126,13 +116,8 @@ class PresetService
 
     /**
      * Returns an analyzer by the ID
-     *
-     * @param string $id
-     * @param array $yamlData
-     * @param array $configuration
-     * @return AbstractAnalyzer|null
      */
-    protected function getAnalyzerById(string $id, array $yamlData, array $configuration): ?AbstractAnalyzer
+    protected function getAnalyzerById(string $id, array $yamlData, array $configuration): ?object
     {
         $analyzer = null;
         foreach ($yamlData['analyzers'] as $analyzerId => $analyzerConfig) {
@@ -149,17 +134,12 @@ class PresetService
 
     /**
      * Returns a CheckUrlGenerator by ID
-     *
-     * @param string $id
-     * @param array $yamlData
-     * @param array $configuration
-     * @return AbstractCheckUrlGenerator|null
      */
     protected function getCheckUrlGeneratorById(
         string $id,
         array $yamlData,
         array $configuration
-    ): ?AbstractCheckUrlGenerator {
+    ): ?object {
         $checkUrlGenerator = null;
         foreach ($yamlData['checkUrlGenerators'] as $checkUrlGeneratorId => $checkUrlGeneratorConfig) {
             if ($checkUrlGeneratorId === $id) {
@@ -178,11 +158,6 @@ class PresetService
 
     /**
      * Returns a testsuite by the ID
-     *
-     * @param string $id
-     * @param array $yamlData
-     * @param array $configuration
-     * @return TestSuite
      */
     protected function getTestSuiteById(string $id, array $yamlData, array $configuration): TestSuite
     {
@@ -208,10 +183,7 @@ class PresetService
     /**
      * Merges local and global configuration and returns the result for the given type
      *
-     * @param array $presetData
-     * @param string $type
-     * @param array $yamlData
-     * @return array
+     * @return mixed[]
      */
     protected function getConfiguration(array $presetData, string $type, array $yamlData): array
     {
@@ -233,7 +205,7 @@ class PresetService
         if (!file_exists(GeneralUtility::getFileAbsFileName($file))) {
             throw new ConfigurationFileNotFoundException(
                 'Configured yaml "' . $file . '" configuration does not exist.',
-                1573216092216
+                1_573_216_092_216
             );
         }
 

@@ -16,7 +16,7 @@ class SerializationService
     /**
      * @var Serializer
      */
-    protected $serializer;
+    protected Serializer $serializer;
 
     /**
      * SerializationService constructor.

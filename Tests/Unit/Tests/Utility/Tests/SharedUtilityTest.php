@@ -8,7 +8,7 @@ namespace UniWue\UwA11yCheck\Tests\Unit\Tests\Internal;
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  */
-
+use DOMElement;
 use DOMDocument;
 use Symfony\Component\DomCrawler\Crawler;
 use TYPO3\TestingFramework\Core\BaseTestCase;
@@ -20,9 +20,9 @@ use UniWue\UwA11yCheck\Utility\Tests\SharedUtility;
 class SharedUtilityTest extends BaseTestCase
 {
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementHasRolePresentationTestsDataProvider()
+    public function elementHasRolePresentationTestsDataProvider(): array
     {
         return [
             'role presentation present' => [
@@ -42,14 +42,14 @@ class SharedUtilityTest extends BaseTestCase
      * @param $role
      * @param $expected
      */
-    public function elementHasRolePresentationTests($role, $expected)
+    public function elementHasRolePresentationTests(string $role, bool $expected): void
     {
         $html = '<div role="' . $role . '">Test</div>';
 
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('div')->item(0);
         $result = SharedUtility::elementHasRolePresentation($element);
 
@@ -57,9 +57,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementHasRoleNoneTestsDataProvider()
+    public function elementHasRoleNoneTestsDataProvider(): array
     {
         return [
             'role none present' => [
@@ -79,14 +79,14 @@ class SharedUtilityTest extends BaseTestCase
      * @param $role
      * @param $expected
      */
-    public function elementHasRoleNoneTests($role, $expected)
+    public function elementHasRoleNoneTests(string $role, bool $expected): void
     {
         $html = '<div role="' . $role . '">Test</div>';
 
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('div')->item(0);
         $result = SharedUtility::elementHasRoleNone($element);
 
@@ -94,9 +94,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementHasAriaLabelValueDataProvider()
+    public function elementHasAriaLabelValueDataProvider(): array
     {
         return [
             'no aria label' => [
@@ -120,12 +120,12 @@ class SharedUtilityTest extends BaseTestCase
      * @param $html
      * @param $expected
      */
-    public function elementHasAriaLabelTests($html, $expected)
+    public function elementHasAriaLabelTests(string $html, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('div')->item(0);
         $result = SharedUtility::elementHasAriaLabelValue($element);
 
@@ -133,9 +133,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementAriaLabelledByValueExistsAndNotEmptyTestsDataProvider()
+    public function elementAriaLabelledByValueExistsAndNotEmptyTestsDataProvider(): array
     {
         return [
             'labelledby element does not exist' => [
@@ -163,11 +163,11 @@ class SharedUtilityTest extends BaseTestCase
      * @param $html
      * @param $expected
      */
-    public function elementAriaLabelledByValueExistsAndNotEmptyTests($html, $expected)
+    public function elementAriaLabelledByValueExistsAndNotEmptyTests(string $html, bool $expected): void
     {
         $crawler = new Crawler($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $crawler->filter('#labelledByElement')->first()->getNode(0);
         $result = SharedUtility::elementAriaLabelledByValueExistsAndNotEmpty($element, $crawler);
 
@@ -175,9 +175,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementHasVisibleTextTestsDataProvider()
+    public function elementHasVisibleTextTestsDataProvider(): array
     {
         return [
             'no text in div' => [
@@ -209,12 +209,12 @@ class SharedUtilityTest extends BaseTestCase
      * @param $html
      * @param $expected
      */
-    public function elementHasVisibleTextTests($html, $expected)
+    public function elementHasVisibleTextTests(string $html, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('div')->item(0);
         $result = SharedUtility::elementHasVisibleText($element);
 
@@ -222,9 +222,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementHasNonEmptyTitleTestsDataProvider()
+    public function elementHasNonEmptyTitleTestsDataProvider(): array
     {
         return [
             'no title' => [
@@ -252,12 +252,12 @@ class SharedUtilityTest extends BaseTestCase
      * @param $html
      * @param $expected
      */
-    public function elementHasNonEmptyTitleTests($html, $expected)
+    public function elementHasNonEmptyTitleTests(string $html, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('div')->item(0);
         $result = SharedUtility::elementHasNonEmptyTitle($element);
 
@@ -265,9 +265,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementHasAltTestsDataProvider()
+    public function elementHasAltTestsDataProvider(): array
     {
         return [
             'image with no alt' => [
@@ -291,12 +291,12 @@ class SharedUtilityTest extends BaseTestCase
      * @param $html
      * @param $expected
      */
-    public function elementHasAltTests($html, $expected)
+    public function elementHasAltTests(string $html, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('img')->item(0);
         $result = SharedUtility::elementHasAlt($element);
 
@@ -304,9 +304,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementTitleNotRedundantTestsDataProvider()
+    public function elementTitleNotRedundantTestsDataProvider(): array
     {
         return [
             'link has no title' => [
@@ -359,12 +359,12 @@ class SharedUtilityTest extends BaseTestCase
      * @param $elementTag
      * @param $expected
      */
-    public function elementTitleNotRedundantTests($html, $elementTag, $expected)
+    public function elementTitleNotRedundantTests(string $html, string $elementTag, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName($elementTag)->item(0);
         $result = SharedUtility::elementTitleNotRedundant($element);
 
@@ -372,9 +372,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string[]|string>>
      */
-    public function elementAttributeValueNotBlacklistedTestsDataProvider()
+    public function elementAttributeValueNotBlacklistedTestsDataProvider(): array
     {
         return [
             'attibute not found' => [
@@ -405,13 +405,14 @@ class SharedUtilityTest extends BaseTestCase
      * @param $attribute
      * @param $blacklist
      * @param $expected
+     * @param string[] $blacklist
      */
-    public function elementAttributeValueNotBlacklistedTests($html, $attribute, $blacklist, $expected)
+    public function elementAttributeValueNotBlacklistedTests(string $html, string $attribute, array $blacklist, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName('a')->item(0);
         $result = SharedUtility::elementAttributeValueNotBlacklisted($element, $attribute, $blacklist);
 
@@ -419,9 +420,9 @@ class SharedUtilityTest extends BaseTestCase
     }
 
     /**
-     * @return array
+     * @return array<string, array<bool|string>>
      */
-    public function elementIsLinkWithHrefTestsDataProvider()
+    public function elementIsLinkWithHrefTestsDataProvider(): array
     {
         return [
             'no link' => [
@@ -454,12 +455,12 @@ class SharedUtilityTest extends BaseTestCase
      * @param $tag
      * @param $expected
      */
-    public function elementIsLinkWithHrefTests($html, $tag, $expected)
+    public function elementIsLinkWithHrefTests(string $html, string $tag, bool $expected): void
     {
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         $element = $doc->getElementsByTagName($tag)->item(0);
         $result = SharedUtility::elementIsLinkWithHref($element);
 

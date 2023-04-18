@@ -18,10 +18,7 @@ class PresetTypeConverter extends AbstractTypeConverter
      */
     protected $presetService;
 
-    /**
-     * @param PresetService $presetService
-     */
-    public function injectConfigurationService(PresetService $presetService)
+    public function injectConfigurationService(PresetService $presetService): void
     {
         $this->presetService = $presetService;
     }
@@ -44,7 +41,6 @@ class PresetTypeConverter extends AbstractTypeConverter
     /**
      * @param mixed $source
      * @param string $targetType
-     * @param array $convertedChildProperties
      * @param PropertyMappingConfigurationInterface|null $configuration
      * @return mixed|object|Error|Preset
      */
@@ -53,11 +49,11 @@ class PresetTypeConverter extends AbstractTypeConverter
         $targetType,
         array $convertedChildProperties = [],
         PropertyMappingConfigurationInterface $configuration = null
-    ) {
+    ): Error|Preset {
         $preset = $this->presetService->getPresetById($source);
 
-        if (!$preset) {
-            return $this->objectManager->get(Error::class, 'Preset not found', 1573053017102);
+        if (!$preset instanceof Preset) {
+            return $this->objectManager->get(Error::class, 'Preset not found', 1_573_053_017_102);
         }
 
         return $preset;

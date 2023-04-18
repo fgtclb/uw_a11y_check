@@ -2,6 +2,7 @@
 
 namespace UniWue\UwA11yCheck\Utility\Tests;
 
+use DOMElement;
 /**
  * Class HeaderUtility
  */
@@ -9,12 +10,8 @@ class HeaderUtility
 {
     /**
      * Returns, if the given current header ins a descend of the given parent header
-     *
-     * @param \DOMElement $previousHeader
-     * @param \DOMElement $currentHeader
-     * @return bool
      */
-    public static function headersSequentiallyDescending(\DOMElement $previousHeader, \DOMElement $currentHeader): bool
+    public static function headersSequentiallyDescending(DOMElement $previousHeader, DOMElement $currentHeader): bool
     {
         $result = false;
 

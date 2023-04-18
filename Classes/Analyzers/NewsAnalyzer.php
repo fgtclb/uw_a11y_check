@@ -21,8 +21,7 @@ class NewsAnalyzer extends AbstractAnalyzer
     /**
      * Return an aray of news record Uids to check
      *
-     * @param Preset $preset
-     * @return array
+     * @return mixed[]
      */
     public function getCheckRecordUids(Preset $preset): array
     {
@@ -44,10 +43,9 @@ class NewsAnalyzer extends AbstractAnalyzer
     /**
      * Returns all news UIDs matching the given demand
      *
-     * @param SingleTableDemand $demand
-     * @return array
+     * @return mixed[]
      */
-    protected function getNewsRecordUids(SingleTableDemand $demand)
+    protected function getNewsRecordUids(SingleTableDemand $demand): array
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable($demand->getTableName());

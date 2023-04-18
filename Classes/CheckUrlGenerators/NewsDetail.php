@@ -38,7 +38,6 @@ class NewsDetail extends AbstractCheckUrlGenerator
     /**
      * Returns the check URL
      *
-     * @param int $newsUid
      * @return string|void
      */
     public function getCheckUrl(int $newsUid): string

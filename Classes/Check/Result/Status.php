@@ -7,8 +7,8 @@ namespace UniWue\UwA11yCheck\Check\Result;
  */
 class Status
 {
-    const PASSES = 0;
-    const VIOLATIONS = 1;
-    const INAPPLICABLE = 2;
-    const INCOMPLETE = 3;
+    final const PASSES = 0;
+    final const VIOLATIONS = 1;
+    final const INAPPLICABLE = 2;
+    final const INCOMPLETE = 3;
 }

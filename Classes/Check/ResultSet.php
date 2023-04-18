@@ -9,64 +9,37 @@ use UniWue\UwA11yCheck\Check\Result\Impact;
  */
 class ResultSet
 {
-    /**
-     * @var int
-     */
-    protected $pid = 0;
+    protected int $pid = 0;
 
-    /**
-     * @var int
-     */
-    protected $uid = 0;
+    protected int $uid = 0;
 
-    /**
-     * @var string
-     */
-    protected $table = '';
+    protected string $table = '';
 
-    /**
-     * @var string
-     */
-    protected $editRecordTable = '';
+    protected string $editRecordTable = '';
 
-    /**
-     * @var bool
-     */
-    protected $failed = false;
+    protected bool $failed = false;
 
-    /**
-     * @var string
-     */
-    protected $failedMessage = '';
+    protected string $failedMessage = '';
 
-    /**
-     * @var string
-     */
-    protected $checkedUrl = '';
+    protected string $checkedUrl = '';
 
     /**
      * @var array
      */
     protected $results = [];
 
-    /**
-     * @return int
-     */
     public function getPid(): int
     {
         return $this->pid;
     }
 
-    /**
-     * @param int $pid
-     */
     public function setPid(int $pid): void
     {
         $this->pid = $pid;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getResults(): array
     {
@@ -74,88 +47,58 @@ class ResultSet
     }
 
     /**
-     * @param array $results
+     * @param mixed[] $results
      */
     public function setResults(array $results): void
     {
         $this->results = $results;
     }
 
-    /**
-     * @return int
-     */
     public function getUid(): int
     {
         return $this->uid;
     }
 
-    /**
-     * @param int $uid
-     */
     public function setUid(int $uid): void
     {
         $this->uid = $uid;
     }
 
-    /**
-     * @return string
-     */
     public function getTable(): string
     {
         return $this->table;
     }
 
-    /**
-     * @param string $table
-     */
     public function setTable(string $table): void
     {
         $this->table = $table;
     }
 
-    /**
-     * @return bool
-     */
     public function getFailed(): bool
     {
         return $this->failed;
     }
 
-    /**
-     * @param bool $failed
-     */
     public function setFailed(bool $failed): void
     {
         $this->failed = $failed;
     }
 
-    /**
-     * @return string
-     */
     public function getFailedMessage(): string
     {
         return $this->failedMessage;
     }
 
-    /**
-     * @param string $failedMessage
-     */
     public function setFailedMessage(string $failedMessage): void
     {
         $this->failedMessage = $failedMessage;
     }
 
-    /**
-     * @return string
-     */
     public function getEditRecordTable(): string
     {
         return $this->editRecordTable;
     }
 
-    /**
-     * @param string $editRecordTable
-     */
     public function setEditRecordTable(string $editRecordTable): void
     {
         $this->editRecordTable = $editRecordTable;
@@ -163,8 +106,6 @@ class ResultSet
 
     /**
      * Returns the highest impact of all results
-     *
-     * @return int
      */
     public function getImpact(): int
     {
@@ -176,24 +117,18 @@ class ResultSet
 
         /** @var Result $result */
         foreach ($this->results as $result) {
-            if (count($result->getNodes()) > 0 && $result->getImpact() > $impact) {
+            if ($result->getNodes() !== [] && $result->getImpact() > $impact) {
                 $impact = $result->getImpact();
             }
         }
         return $impact;
     }
 
-    /**
-     * @return string
-     */
     public function getCheckedUrl(): string
     {
         return $this->checkedUrl;
     }
 
-    /**
-     * @param string $checkedUrl
-     */
     public function setCheckedUrl(string $checkedUrl): void
     {
         $this->checkedUrl = $checkedUrl;

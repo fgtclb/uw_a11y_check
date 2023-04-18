@@ -1,11 +1,12 @@
 <?php
 
-defined('TYPO3_MODE') or die();
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+defined('TYPO3_MODE') || die();
 
 /**
  * Plugins
  */
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
+ExtensionUtility::registerPlugin(
     'uw_a11y_check',
     'Pi1',
     'Display content elements for a11y check'

@@ -2,16 +2,13 @@
 
 namespace UniWue\UwA11yCheck\Utility\Tests;
 
+use DOMElement;
 /**
  * Class LinkUtility
  */
 class LinkUtility
 {
-    /**
-     * @param \DOMElement $element
-     * @return bool
-     */
-    public static function linkHasImageWithAlt(\DOMElement $element): bool
+    public static function linkHasImageWithAlt(DOMElement $element): bool
     {
         $result = false;
         $images = $element->getElementsByTagName('img');
@@ -21,7 +18,7 @@ class LinkUtility
             return false;
         }
 
-        /** @var \DOMElement $image */
+        /** @var DOMElement $image */
         foreach ($images as $image) {
             if ($image->getAttribute('alt') !== '') {
                 $result = true;
@@ -32,29 +29,18 @@ class LinkUtility
         return $result;
     }
 
-    /**
-     * @param \DOMElement $element
-     * @param array $blacklist
-     * @return bool
-     */
-    public static function linkTextNotBlacklisted(\DOMElement $element, array $blacklist): bool
+    public static function linkTextNotBlacklisted(DOMElement $element, array $blacklist): bool
     {
         if (empty($blacklist) || StringUtility::stripNewLines($element->textContent) === '') {
             return true;
         }
         $content = StringUtility::clearString($element->textContent);
 
-        return in_array(strtolower($content), $blacklist, true) === false;
+        return !in_array(strtolower($content), $blacklist, true);
     }
 
-    /**
-     * @param \DOMElement $element
-     * @param string $attribute
-     * @param array $blacklist
-     * @return bool
-     */
     public static function linkImageAttributeNotBlacklisted(
-        \DOMElement $element,
+        DOMElement $element,
         string $attribute,
         array $blacklist
     ): bool {
@@ -69,7 +55,7 @@ class LinkUtility
             return true;
         }
 
-        /** @var \DOMElement $image */
+        /** @var DOMElement $image */
         foreach ($images as $image) {
             if (!SharedUtility::elementAttributeValueNotBlacklisted($image, $attribute, $blacklist)) {
                 return false;
@@ -84,15 +70,14 @@ class LinkUtility
      * Checks, if the link name for the given array of link DOMElements is redundant and if so, returns an array
      * of link affected DOMElements
      *
-     * @param array $elements
-     * @return array
+     * @return array<string, DOMElement>
      */
     public static function getRedundantLinkNames(array $elements): array
     {
         $linkNames = [];
         $redundantLinks = [];
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         foreach ($elements as $element) {
             if (StringUtility::stripNewLines($element->textContent) !== ''
                 && !in_array($element->textContent, $linkNames)

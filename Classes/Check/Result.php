@@ -10,203 +10,126 @@ use UniWue\UwA11yCheck\Check\Result\Node;
  */
 class Result
 {
-    /**
-     * @var int|null
-     */
-    protected $status;
+    protected ?int $status = null;
 
-    /**
-     * @var string
-     */
-    protected $description = '';
+    protected string $description = '';
 
-    /**
-     * @var string
-     */
-    protected $help = '';
+    protected string $help = '';
 
-    /**
-     * @var string
-     */
-    protected $helpUrl = '';
+    protected string $helpUrl = '';
 
-    /**
-     * @var int|null
-     */
-    protected $impact;
+    protected ?int $impact = null;
 
     /**
      * @var array
      */
     protected $nodes = [];
 
-    /**
-     * @var string
-     */
-    protected $testId = '';
+    protected string $testId = '';
 
-    /**
-     * @return int|null
-     */
     public function getStatus(): ?int
     {
         return $this->status;
     }
 
-    /**
-     * @param int|null $status
-     */
     public function setStatus(?int $status): void
     {
         $this->status = $status;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
     public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    /**
-     * @return string
-     */
     public function getHelp(): string
     {
         return $this->help;
     }
 
-    /**
-     * @param string $help
-     */
     public function setHelp(string $help): void
     {
         $this->help = $help;
     }
 
-    /**
-     * @return string
-     */
     public function getHelpUrl(): string
     {
         return $this->helpUrl;
     }
 
-    /**
-     * @param string $helpUrl
-     */
     public function setHelpUrl(string $helpUrl): void
     {
         $this->helpUrl = $helpUrl;
     }
 
-    /**
-     * @return int|null
-     */
     public function getImpact(): ?int
     {
         return $this->impact;
     }
 
-    /**
-     * @param int|null $impact
-     */
     public function setImpact(?int $impact): void
     {
         $this->impact = $impact;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getNodes(): array
     {
         return $this->nodes;
     }
 
-    /**
-     * @param Node $node
-     */
-    public function addNode(Node $node)
+    public function addNode(Node $node): void
     {
         $this->nodes[] = $node;
     }
 
     /**
-     * @param array $nodes
+     * @param mixed[] $nodes
      */
     public function setNodes(array $nodes): void
     {
         $this->nodes = $nodes;
     }
 
-    /**
-     * @return string
-     */
     public function getTestId(): string
     {
         return $this->testId;
     }
 
-    /**
-     * @param string $testId
-     */
     public function setTestId(string $testId): void
     {
         $this->testId = $testId;
     }
 
-    /**
-     * @return bool
-     */
     public function getHasErrors(): bool
     {
-        return count($this->nodes) > 0;
+        return $this->nodes !== [];
     }
 
     /**
      * Returns the state of the result used in Fluid
-     *
-     * @return int
      */
     public function getState(): int
     {
-        switch ($this->status) {
-            case 0:
-                $state = 0;
-                break;
-            case 1:
-                if ($this->getImpact() >= 3) {
-                    $state = 2;
-                } else {
-                    $state = 1;
-                }
-                break;
-            case 2:
-                $state = -1;
-                break;
-            default:
-                $state = 1;
-        }
-
-        return $state;
+        return match ($this->status) {
+            0 => 0,
+            1 => $this->getImpact() >= 3 ? 2 : 1,
+            2 => -1,
+            default => 1,
+        };
     }
 
     /**
      * Returns the title for the check used in Fluid
-     *
-     * @return string
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         $status = $this->status ?? 1;
         return LocalizationUtility::translate(

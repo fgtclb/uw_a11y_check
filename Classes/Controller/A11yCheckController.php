@@ -2,6 +2,10 @@
 
 namespace UniWue\UwA11yCheck\Controller;
 
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Annotation\IgnoreValidation;
+use Psr\Http\Message\ResponseInterface;
+use DateTime;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\Menu\Menu;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
@@ -20,20 +24,17 @@ use UniWue\UwA11yCheck\Service\ResultsService;
 /**
  * Class A11yCheckController
  */
-class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class A11yCheckController extends ActionController
 {
-    const LANG_CORE = 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:';
-    const LANG_LOCAL = 'LLL:EXT:uw_a11y_check/Resources/Private/Language/locallang.xlf:';
+    final const LANG_CORE = 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:';
+    final const LANG_LOCAL = 'LLL:EXT:uw_a11y_check/Resources/Private/Language/locallang.xlf:';
 
     /**
      * @var PresetService
      */
     protected $presetService;
 
-    /**
-     * @param PresetService $presetService
-     */
-    public function injectPresetService(PresetService $presetService)
+    public function injectPresetService(PresetService $presetService): void
     {
         $this->presetService = $presetService;
     }
@@ -43,7 +44,7 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
      *
      * @var string
      */
-    protected $defaultViewObjectName = \TYPO3\CMS\Backend\View\BackendTemplateView::class;
+    protected $defaultViewObjectName = BackendTemplateView::class;
 
     /**
      * The current page uid
@@ -71,10 +72,8 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
 
     /**
      * Set up the doc header properly here
-     *
-     * @param ViewInterface $view
      */
-    protected function initializeView(ViewInterface $view)
+    protected function initializeView(ViewInterface $view): void
     {
         /** @var BackendTemplateView $view */
         parent::initializeView($view);
@@ -96,7 +95,7 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     /**
      * Initialize action
      */
-    public function initializeAction()
+    public function initializeAction(): void
     {
         $this->pid = (int)GeneralUtility::_GET('id');
     }
@@ -104,12 +103,12 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     /**
      * Index action
      *
-     * @param \UniWue\UwA11yCheck\Domain\Model\Dto\CheckDemand $checkDemand
-     * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("checkDemand")
+     * @param CheckDemand $checkDemand
+     * @IgnoreValidation("checkDemand")
      */
     public function indexAction($checkDemand = null): void
     {
-        if (!$checkDemand) {
+        if ($checkDemand === null) {
             $checkDemand = new CheckDemand();
         }
 
@@ -153,10 +152,9 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     /**
      * Check action
      *
-     * @param \UniWue\UwA11yCheck\Domain\Model\Dto\CheckDemand $checkDemand
-     * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("checkDemand")
+     * @IgnoreValidation("checkDemand")
      */
-    public function checkAction(CheckDemand $checkDemand): void
+    public function checkAction(CheckDemand $checkDemand): ResponseInterface
     {
         $preset = $checkDemand->getPreset();
         $results = $preset->executeTestSuiteByPageUid($this->pid, $checkDemand->getLevel());
@@ -164,14 +162,15 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
         $this->view->assignMultiple([
             'checkDemand' => $checkDemand,
             'results' => $results,
-            'date' => new \DateTime()
+            'date' => new DateTime()
         ]);
+        return $this->htmlResponse();
     }
 
     /**
      * Results action
      */
-    public function resultsAction(): void
+    public function resultsAction(): ResponseInterface
     {
         $this->createAcknowledgeButton($this->pid);
         $resultsArray = $this->resultsService->getResultsArrayByPid($this->pid);
@@ -179,14 +178,13 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
         $this->view->assignMultiple([
             'resultsArray' => $resultsArray
         ]);
+        return $this->htmlResponse();
     }
 
     /**
      * AcknowledgeResult Action
-     *
-     * @param int $pageUid
      */
-    public function acknowledgeResultAction(int $pageUid)
+    public function acknowledgeResultAction(int $pageUid): void
     {
         $this->resultsService->deleteSavedResults($pageUid);
         $this->redirect('index');
@@ -195,7 +193,7 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     /**
      * Create menu
      */
-    protected function createMenu()
+    protected function createMenu(): void
     {
         $uriBuilder = $this->objectManager->get(UriBuilder::class);
         $uriBuilder->setRequest($this->request);
@@ -237,8 +235,6 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
 
     /**
      * Creates the acknowledge button
-     *
-     * @param int $pid
      */
     protected function createAcknowledgeButton(int $pid): void
     {
@@ -263,7 +259,7 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     protected function getLevelSelectorOptions(): array
     {

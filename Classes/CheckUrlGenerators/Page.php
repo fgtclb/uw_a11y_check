@@ -26,7 +26,6 @@ class Page extends AbstractCheckUrlGenerator
     /**
      * Returns the check URL
      *
-     * @param int $pageUid
      * @return string|void
      */
     public function getCheckUrl(int $pageUid): string
