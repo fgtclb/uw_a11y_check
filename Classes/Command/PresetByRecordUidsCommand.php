@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace UniWue\UwA11yCheck\Command;
 
+use UniWue\UwA11yCheck\Check\Preset;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,7 +22,7 @@ class PresetByRecordUidsCommand extends AbstractCheckCommand
     /**
      * Configuring the command options
      */
-    public function configure()
+    public function configure(): void
     {
         $this
             ->setDescription(
@@ -42,11 +43,9 @@ class PresetByRecordUidsCommand extends AbstractCheckCommand
     /**
      * Execute the command
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int|void|null
+     * @return int|void
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $presetService = $objectManager->get(PresetService::class);
@@ -58,7 +57,7 @@ class PresetByRecordUidsCommand extends AbstractCheckCommand
         $recordUids = GeneralUtility::intExplode(',', $input->getArgument('uids'), true);
         $preset = $presetService->getPresetById($presetId);
 
-        if (!$preset) {
+        if (!$preset instanceof Preset) {
             // @extensionScannerIgnoreLine False positive
             $io->error('Preset "' . $presetId . '" not found or contains errors (check classNames!).');
             return 1;

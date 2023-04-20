@@ -1,19 +1,21 @@
 <?php
 
-defined('TYPO3_MODE') or die();
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+use UniWue\UwA11yCheck\Controller\A11yCheckController;
+defined('TYPO3') || die();
 
-call_user_func(function () {
+call_user_func(function (): void {
     if (TYPO3_MODE === 'BE') {
         /**
          * Register Administration Module
          */
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-            'UniWue.uw_a11y_check',
+        ExtensionUtility::registerModule(
+            'UwA11yCheck',
             'web',
             'tx_uwa11ycheck_m1',
             '',
             [
-                'A11yCheck' => 'index,check,results,acknowledgeResult',
+                A11yCheckController::class => 'index,check,results,acknowledgeResult',
             ],
             [
                 'access' => 'user,group',

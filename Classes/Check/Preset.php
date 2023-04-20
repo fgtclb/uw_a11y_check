@@ -10,96 +10,35 @@ use UniWue\UwA11yCheck\CheckUrlGenerators\AbstractCheckUrlGenerator;
  */
 class Preset
 {
-    /**
-     * @var string
-     */
-    protected $id = '';
-
-    /**
-     * @var string
-     */
-    protected $name = '';
-
-    /**
-     * @var string
-     */
-    protected $description = '';
-
-    /**
-     * @var AbstractAnalyzer
-     */
-    protected $analyzer;
-
-    /**
-     * @var AbstractCheckUrlGenerator
-     */
-    protected $checkUrlGenerator;
-
-    /**
-     * @var TestSuite
-     */
-    protected $testSuite;
+    protected string $description = '';
 
     /**
      * Preset constructor.
-     *
-     * @param string $id
-     * @param string $name
-     * @param AbstractAnalyzer $analyzer
-     * @param AbstractCheckUrlGenerator $checkUrlGenerator
-     * @param TestSuite $testSuite
-     * @param array $configuration
      */
-    public function __construct(
-        string $id,
-        string $name,
-        AbstractAnalyzer $analyzer,
-        AbstractCheckUrlGenerator $checkUrlGenerator,
-        TestSuite $testSuite,
-        array $configuration
-    ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->analyzer = $analyzer;
-        $this->checkUrlGenerator = $checkUrlGenerator;
-        $this->testSuite = $testSuite;
+    public function __construct(protected string $id, protected string $name, protected AbstractAnalyzer $analyzer, protected AbstractCheckUrlGenerator $checkUrlGenerator, protected TestSuite $testSuite, array $configuration)
+    {
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @return string
-     */
     public function getCheckTableName(): string
     {
         return $this->checkUrlGenerator->getTableName();
     }
 
-    /**
-     * @return string
-     */
     public function getEditRecordTableName(): string
     {
         return $this->checkUrlGenerator->getEditRecordTable();
@@ -107,18 +46,12 @@ class Preset
 
     /**
      * Returns the check URL
-     *
-     * @param int $id
-     * @return string
      */
     public function getCheckUrl(int $id): string
     {
         return $this->checkUrlGenerator->getCheckUrl($id);
     }
 
-    /**
-     * @return TestSuite
-     */
     public function getTestSuite(): TestSuite
     {
         return $this->testSuite;
@@ -127,11 +60,9 @@ class Preset
     /**
      * Executes the testSuite configured in the preset by the given page UID and recursive levels
      *
-     * @param int $pageUid
-     * @param int $levels
-     * @return array
+     * @return ResultSet[]
      */
-    public function executeTestSuiteByPageUid(int $pageUid, int $levels)
+    public function executeTestSuiteByPageUid(int $pageUid, int $levels): array
     {
         $result = [];
         $this->analyzer->initializePageUids($pageUid, $levels);
@@ -146,8 +77,7 @@ class Preset
     /**
      * Executes the testSuite configured in the preset by the given array of record UIDs
      *
-     * @param array $recordUids
-     * @return array
+     * @return ResultSet[]
      */
     public function executeTestSuiteByRecordUids(array $recordUids): array
     {

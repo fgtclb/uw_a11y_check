@@ -3,13 +3,14 @@
 declare(strict_types=1);
 namespace UniWue\UwA11yCheck\Command;
 
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use UniWue\UwA11yCheck\Check\Preset;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use UniWue\UwA11yCheck\Check\Result\Impact;
 use UniWue\UwA11yCheck\Check\ResultSet;
 use UniWue\UwA11yCheck\Service\PresetService;
@@ -22,7 +23,7 @@ class PresetByPageUidCommand extends AbstractCheckCommand
     /**
      * Configuring the command options
      */
-    public function configure()
+    public function configure(): void
     {
         $this
             ->setDescription('a11y check for the given preset and page uid (recursive by "levels" if set)')
@@ -47,11 +48,9 @@ class PresetByPageUidCommand extends AbstractCheckCommand
     /**
      * Execute the command
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int|void|null
+     * @return int|void
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $presetService = $objectManager->get(PresetService::class);
@@ -65,7 +64,7 @@ class PresetByPageUidCommand extends AbstractCheckCommand
 
         $preset = $presetService->getPresetById($presetId);
 
-        if (!$preset) {
+        if (!$preset instanceof Preset) {
             // @extensionScannerIgnoreLine False positive
             $io->error('Preset "' . $presetId . '" not found or contains errors (check classNames!).');
             return 1;

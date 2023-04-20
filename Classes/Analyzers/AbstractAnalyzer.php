@@ -2,6 +2,7 @@
 
 namespace UniWue\UwA11yCheck\Analyzers;
 
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Client;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\QueryGenerator;
@@ -15,31 +16,21 @@ use UniWue\UwA11yCheck\Tests\TestInterface;
  */
 abstract class AbstractAnalyzer implements AnalyzerInterface
 {
-    const TYPE_INTERNAL = 'internal';
+    final const TYPE_INTERNAL = 'internal';
 
-    /**
-     * @var string
-     */
-    protected $type = '';
+    protected  string $type = '';
 
     /**
      * @var array
      */
     protected $pageUids = [];
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
     /**
      * Runs all tests for the given preset and recordUid
-     *
-     * @param Preset $preset
-     * @param int $recordUid
-     * @return ResultSet
      */
     public function runTests(Preset $preset, int $recordUid): ResultSet
     {
@@ -58,7 +49,7 @@ abstract class AbstractAnalyzer implements AnalyzerInterface
                 $result = $test->run($html, $recordUid);
                 $results[] = $result;
             }
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
+        } catch (ClientException $e) {
             $resultSet->setFailed(true);
             $resultSet->setFailedMessage($e->getMessage());
         }
@@ -75,9 +66,6 @@ abstract class AbstractAnalyzer implements AnalyzerInterface
 
     /**
      * Initializes the pageUids to check
-     *
-     * @param int $pageUid
-     * @param int $levels
      */
     public function initializePageUids(int $pageUid, int $levels = 0): void
     {
@@ -93,10 +81,6 @@ abstract class AbstractAnalyzer implements AnalyzerInterface
 
     /**
      * Returns the PID of the record
-     *
-     * @param string $table
-     * @param int $recordUid
-     * @return int
      */
     protected function getPidByRecordUid(string $table, int $recordUid): int
     {
@@ -110,9 +94,6 @@ abstract class AbstractAnalyzer implements AnalyzerInterface
 
     /**
      * Fetches the resulting HTML from the given URL
-     *
-     * @param string $url
-     * @return string
      */
     protected function fetchHtml(string $url): string
     {

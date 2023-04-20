@@ -3,9 +3,10 @@
 declare(strict_types=1);
 namespace UniWue\UwA11yCheck\Utility\Exception;
 
+use RuntimeException;
 /**
  * Exception thrown if the configuration yaml file is not found
  */
-class ConfigurationFileNotFoundException extends \RuntimeException
+class ConfigurationFileNotFoundException extends RuntimeException
 {
 }

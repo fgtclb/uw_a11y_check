@@ -3,6 +3,7 @@
 declare(strict_types=1);
 namespace UniWue\UwA11yCheck\Command;
 
+use PDO;
 use Symfony\Component\Console\Command\Command;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -15,10 +16,7 @@ use UniWue\UwA11yCheck\Service\SerializationService;
  */
 abstract class AbstractCheckCommand extends Command
 {
-    /**
-     * @var SerializationService
-     */
-    protected $serializationService;
+    protected SerializationService $serializationService;
 
     /**
      * AbstractCheckCommand constructor.
@@ -33,9 +31,6 @@ abstract class AbstractCheckCommand extends Command
 
     /**
      * Saves the given results
-     *
-     * @param Preset $preset
-     * @param array $results
      */
     public function saveResults(Preset $preset, array $results): void
     {
@@ -48,9 +43,6 @@ abstract class AbstractCheckCommand extends Command
 
     /**
      * Saves a single result to the database
-     *
-     * @param Preset $preset
-     * @param ResultSet $resultSet
      */
     protected function saveResult(Preset $preset, ResultSet $resultSet): void
     {
@@ -73,9 +65,6 @@ abstract class AbstractCheckCommand extends Command
 
     /**
      * Cleans up old check results in the database
-     *
-     * @param Preset $preset
-     * @param ResultSet $resultSet
      */
     protected function cleanupOldResults(Preset $preset, ResultSet $resultSet): void
     {
@@ -87,11 +76,11 @@ abstract class AbstractCheckCommand extends Command
             ->where(
                 $queryBuilder->expr()->eq(
                     'pid',
-                    $queryBuilder->createNamedParameter($resultSet->getPid(), \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($resultSet->getPid(), PDO::PARAM_INT)
                 ),
                 $queryBuilder->expr()->eq(
                     'record_uid',
-                    $queryBuilder->createNamedParameter($resultSet->getUid(), \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($resultSet->getUid(), PDO::PARAM_INT)
                 ),
                 $queryBuilder->expr()->eq(
                     'preset_id',

@@ -7,14 +7,12 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Torben Hansen on behalf of Universität Würzburg',
     'author_email' => 'torben@derhansen.com',
     'state' => 'beta',
-    'uploadfolder' => '0',
-    'createDirs' => '',
-    'clearCacheOnLoad' => 1,
+    'clearCacheOnLoad' => true,
     'version' => '3.1.2',
     'constraints' => [
         'depends' => [
-            'typo3' => '10.4.0-10.4.99',
-            'php' => '7.2.0-7.4.99',
+            'typo3' => '10.4.0-11.5.99',
+            'php' => '8.0.0-8.2.99',
         ],
         'conflicts' => [],
         'suggests' => [],

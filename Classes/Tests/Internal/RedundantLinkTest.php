@@ -2,6 +2,10 @@
 
 namespace UniWue\UwA11yCheck\Tests\Internal;
 
+use UniWue\UwA11yCheck\Check\Result\Impact;
+use UniWue\UwA11yCheck\Check\Result\Node;
+use UniWue\UwA11yCheck\Check\Result\Status;
+use DOMElement;
 use Symfony\Component\DomCrawler\Crawler;
 use UniWue\UwA11yCheck\Check\Result;
 use UniWue\UwA11yCheck\Tests\AbstractTest;
@@ -21,14 +25,10 @@ class RedundantLinkTest extends AbstractTest
     /**
      * @var int
      */
-    protected $impact = Result\Impact::MINOR;
+    protected $impact = Impact::MINOR;
 
     /**
      * Runs the test
-     *
-     * @param string $html
-     * @param int $fallbackElementUid
-     * @return Result
      */
     public function run(string $html, int $fallbackElementUid): Result
     {
@@ -39,19 +39,19 @@ class RedundantLinkTest extends AbstractTest
 
         $redundantLinks = $this->getRedundantLinks($elements);
 
-        if (count($redundantLinks) > 0) {
+        if ($redundantLinks !== []) {
             foreach ($redundantLinks as $element) {
-                $node = new Result\Node();
+                $node = new Node();
                 $node->setHtml($element->ownerDocument->saveHTML($element));
                 $node->setUid($this->getElementUid($element, $fallbackElementUid));
                 $result->addNode($node);
-                $result->setStatus(Result\Status::VIOLATIONS);
+                $result->setStatus(Status::VIOLATIONS);
             }
         }
 
         // If all found nodes passed, set status to passes
-        if ($elements->count() > 0 && count($result->getNodes()) === 0) {
-            $result->setStatus(Result\Status::PASSES);
+        if ($elements->count() > 0 && $result->getNodes() === []) {
+            $result->setStatus(Status::PASSES);
         }
 
         return $result;
@@ -61,7 +61,7 @@ class RedundantLinkTest extends AbstractTest
      * Returns an array of all redundant links for the given object of elements
      *
      * @param Crawler $elements
-     * @return array
+     * @return mixed[]
      */
     protected function getRedundantLinks(Crawler $elements): array
     {
@@ -70,7 +70,7 @@ class RedundantLinkTest extends AbstractTest
 
         foreach ($groupedLinks as $elementArray) {
             $redundantLinkNames = LinkUtility::getRedundantLinkNames($elementArray);
-            if (count($elementArray) > 1 && count($redundantLinkNames) >= 1) {
+            if ((is_countable($elementArray) ? count($elementArray) : 0) > 1 && count($redundantLinkNames) >= 1) {
                 $result = array_merge($result, $redundantLinkNames);
             }
         }
@@ -82,13 +82,13 @@ class RedundantLinkTest extends AbstractTest
      * Returns an array of links grouped by its href
      *
      * @param Crawler $element
-     * @return array
+     * @return array<string, DOMElement[]>
      */
     protected function groupLinksByHref(Crawler $elements): array
     {
         $allLinks = [];
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         foreach ($elements as $element) {
             if (!$element->hasAttribute('href') ||
                 SharedUtility::elementHasRolePresentation($element) ||

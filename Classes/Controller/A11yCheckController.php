@@ -2,6 +2,11 @@
 
 namespace UniWue\UwA11yCheck\Controller;
 
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Annotation\IgnoreValidation;
+use Psr\Http\Message\ResponseInterface;
+use DateTime;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\Menu\Menu;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
@@ -12,7 +17,10 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use TYPO3\CMS\Fluid\View\TemplateView;
 use UniWue\UwA11yCheck\Domain\Model\Dto\CheckDemand;
 use UniWue\UwA11yCheck\Service\PresetService;
 use UniWue\UwA11yCheck\Service\ResultsService;
@@ -20,71 +28,50 @@ use UniWue\UwA11yCheck\Service\ResultsService;
 /**
  * Class A11yCheckController
  */
-class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class A11yCheckController extends ActionController
 {
-    const LANG_CORE = 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:';
-    const LANG_LOCAL = 'LLL:EXT:uw_a11y_check/Resources/Private/Language/locallang.xlf:';
+    final const LANG_CORE = 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:';
+    final const LANG_LOCAL = 'LLL:EXT:uw_a11y_check/Resources/Private/Language/locallang.xlf:';
+
+    protected PresetService $presetService;
+
+    private ModuleTemplateFactory $moduleTemplateFactory;
+
 
     /**
-     * @var PresetService
+     * The current page uid
      */
-    protected $presetService;
+    protected int $pid = 0;
 
-    /**
-     * @param PresetService $presetService
-     */
-    public function injectPresetService(PresetService $presetService)
+    protected IconFactory $iconFactory;
+
+    protected ResultsService $resultsService;
+
+    public function __construct(ModuleTemplateFactory $moduleTemplateFactory)
+    {
+        $this->moduleTemplateFactory = $moduleTemplateFactory;
+    }
+
+    public function injectPresetService(PresetService $presetService): void
     {
         $this->presetService = $presetService;
     }
 
     /**
-     * Backend Template Container
-     *
-     * @var string
-     */
-    protected $defaultViewObjectName = \TYPO3\CMS\Backend\View\BackendTemplateView::class;
-
-    /**
-     * The current page uid
-     *
-     * @var int
-     */
-    protected $pid = 0;
-
-    /**
-     * BackendTemplateContainer
-     *
-     * @var BackendTemplateView
-     */
-    protected $view;
-
-    /**
-     * @var IconFactory
-     */
-    protected $iconFactory;
-
-    /**
-     * @var ResultsService
-     */
-    protected $resultsService;
-
-    /**
      * Set up the doc header properly here
-     *
-     * @param ViewInterface $view
      */
-    protected function initializeView(ViewInterface $view)
+    protected function initializeView(ViewInterface $view): void
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         /** @var BackendTemplateView $view */
         parent::initializeView($view);
 
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $this->resultsService = $this->objectManager->get(ResultsService::class);
+        $this->resultsService =GeneralUtility::makeInstance(ObjectManager::class)->get(ResultsService::class);
 
-        $this->view->getModuleTemplate()->setFlashMessageQueue($this->controllerContext->getFlashMessageQueue());
-        if ($view instanceof BackendTemplateView) {
-            $view->getModuleTemplate()->getPageRenderer()->addCssFile(
+        $moduleTemplate->setFlashMessageQueue($this->controllerContext->getFlashMessageQueue());
+        if ($view instanceof TemplateView) {
+            $moduleTemplate->getPageRenderer()->addCssFile(
                 'EXT:uw_a11y_check/Resources/Public/Css/a11y_check.css'
             );
         }
@@ -96,7 +83,7 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     /**
      * Initialize action
      */
-    public function initializeAction()
+    public function initializeAction(): void
     {
         $this->pid = (int)GeneralUtility::_GET('id');
     }
@@ -104,12 +91,12 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     /**
      * Index action
      *
-     * @param \UniWue\UwA11yCheck\Domain\Model\Dto\CheckDemand $checkDemand
-     * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("checkDemand")
+     * @IgnoreValidation("checkDemand")
      */
-    public function indexAction($checkDemand = null): void
+    public function indexAction(CheckDemand $checkDemand = null): ResponseInterface
     {
-        if (!$checkDemand) {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
+        if ($checkDemand === null) {
             $checkDemand = new CheckDemand();
         }
 
@@ -124,13 +111,14 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
                 ]
             );
         }
-
         $this->view->assignMultiple([
             'checkDemand' => $checkDemand,
             'presets' => $this->presetService->getPresets(),
             'levelSelectorOptions' => $this->getLevelSelectorOptions(),
             'savedResultsCount' => $this->resultsService->getSavedResultsCount($this->pid),
         ]);
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
@@ -153,54 +141,61 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     /**
      * Check action
      *
-     * @param \UniWue\UwA11yCheck\Domain\Model\Dto\CheckDemand $checkDemand
-     * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation("checkDemand")
+     * @IgnoreValidation("checkDemand")
      */
-    public function checkAction(CheckDemand $checkDemand): void
+    public function checkAction(CheckDemand $checkDemand): ResponseInterface
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $preset = $checkDemand->getPreset();
         $results = $preset->executeTestSuiteByPageUid($this->pid, $checkDemand->getLevel());
 
         $this->view->assignMultiple([
             'checkDemand' => $checkDemand,
             'results' => $results,
-            'date' => new \DateTime()
+            'date' => new DateTime()
         ]);
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
      * Results action
      */
-    public function resultsAction(): void
+    public function resultsAction(): ResponseInterface
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $this->createAcknowledgeButton($this->pid);
         $resultsArray = $this->resultsService->getResultsArrayByPid($this->pid);
 
         $this->view->assignMultiple([
             'resultsArray' => $resultsArray
         ]);
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
      * AcknowledgeResult Action
-     *
-     * @param int $pageUid
      */
-    public function acknowledgeResultAction(int $pageUid)
+    public function acknowledgeResultAction(int $pageUid): ResponseInterface
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $this->resultsService->deleteSavedResults($pageUid);
         $this->redirect('index');
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
      * Create menu
      */
-    protected function createMenu()
+    protected function createMenu(): void
     {
-        $uriBuilder = $this->objectManager->get(UriBuilder::class);
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
+        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $uriBuilder->setRequest($this->request);
 
-        $menu = $this->view->getModuleTemplate()->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
+        $menu = $moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->makeMenu();
         $menu->setIdentifier('uw_a11y_check');
 
         $actions = ['index', 'results'];
@@ -214,7 +209,7 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
         }
 
         if ($menu instanceof Menu) {
-            $this->view->getModuleTemplate()->getDocHeaderComponent()->getMenuRegistry()->addMenu($menu);
+            $moduleTemplate->getDocHeaderComponent()->getMenuRegistry()->addMenu($menu);
         }
     }
 
@@ -223,13 +218,14 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
      */
     protected function createDefaultButtons(): void
     {
-        $buttonBar = $this->view->getModuleTemplate()->getDocHeaderComponent()->getButtonBar();
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
+        $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
         // Shortcut
         if ($this->getBackendUser()->mayMakeShortcut()) {
             $shortcutButton = $buttonBar->makeShortcutButton()
-                ->setModuleName('web_UwA11yCheckTxUwa11ycheckM1')
-                ->setGetVariables(['route', 'module', 'id'])
+                ->setRouteIdentifier('web_UwA11yCheckTxUwa11ycheckM1')
+                ->setArguments(['route', 'module', 'id'])
                 ->setDisplayName('Shortcut');
             $buttonBar->addButton($shortcutButton, ButtonBar::BUTTON_POSITION_RIGHT);
         }
@@ -237,15 +233,14 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
 
     /**
      * Creates the acknowledge button
-     *
-     * @param int $pid
      */
     protected function createAcknowledgeButton(int $pid): void
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $uriBuilder = $this->objectManager->get(UriBuilder::class);
         $uriBuilder->setRequest($this->request);
 
-        $buttonBar = $this->view->getModuleTemplate()->getDocHeaderComponent()->getButtonBar();
+        $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
         $title = $this->getLanguageService()->sL(self::LANG_LOCAL . 'labels.acknowledgeResults');
         $button = $buttonBar->makeLinkButton();
@@ -263,7 +258,7 @@ class A11yCheckController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     protected function getLevelSelectorOptions(): array
     {

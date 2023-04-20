@@ -1,11 +1,12 @@
 <?php
 
-defined('TYPO3_MODE') or die();
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+defined('TYPO3') || die();
 
 /**
  * Default TypoScript
  */
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
+ExtensionManagementUtility::addStaticFile(
     'uw_a11y_check',
     'Configuration/TypoScript',
     'TYPO3 Accessibility Check'

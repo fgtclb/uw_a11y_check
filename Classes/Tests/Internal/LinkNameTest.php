@@ -2,6 +2,10 @@
 
 namespace UniWue\UwA11yCheck\Tests\Internal;
 
+use UniWue\UwA11yCheck\Check\Result\Impact;
+use DOMElement;
+use UniWue\UwA11yCheck\Check\Result\Node;
+use UniWue\UwA11yCheck\Check\Result\Status;
 use Symfony\Component\DomCrawler\Crawler;
 use UniWue\UwA11yCheck\Check\Result;
 use UniWue\UwA11yCheck\Tests\AbstractTest;
@@ -26,14 +30,10 @@ class LinkNameTest extends AbstractTest
     /**
      * @var int
      */
-    protected $impact = Result\Impact::SERIOUS;
+    protected $impact = Impact::SERIOUS;
 
     /**
      * Runs the test
-     *
-     * @param string $html
-     * @param int $fallbackElementUid
-     * @return Result
      */
     public function run(string $html, int $fallbackElementUid): Result
     {
@@ -42,7 +42,7 @@ class LinkNameTest extends AbstractTest
         $crawler = new Crawler($html);
         $links = $crawler->filter('a[href]');
 
-        /** @var \DOMElement $link */
+        /** @var DOMElement $link */
         foreach ($links as $link) {
             $checkResult = SharedUtility::elementHasVisibleText($link) ||
                 SharedUtility::elementHasAriaLabelValue($link) ||
@@ -52,17 +52,17 @@ class LinkNameTest extends AbstractTest
                 LinkUtility::linkHasImageWithAlt($link);
 
             if (!$checkResult) {
-                $node = new Result\Node();
+                $node = new Node();
                 $node->setHtml($link->ownerDocument->saveHTML($link));
                 $node->setUid($this->getElementUid($link, $fallbackElementUid));
                 $result->addNode($node);
-                $result->setStatus(Result\Status::VIOLATIONS);
+                $result->setStatus(Status::VIOLATIONS);
             }
         }
 
         // If all found nodes passed, set status to passes
-        if ($links->count() > 0 && count($result->getNodes()) === 0) {
-            $result->setStatus(Result\Status::PASSES);
+        if ($links->count() > 0 && $result->getNodes() === []) {
+            $result->setStatus(Status::PASSES);
         }
 
         return $result;

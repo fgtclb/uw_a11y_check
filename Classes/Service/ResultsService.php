@@ -2,6 +2,8 @@
 
 namespace UniWue\UwA11yCheck\Service;
 
+use DateTime;
+use PDO;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use UniWue\UwA11yCheck\Check\ResultSet;
@@ -11,28 +13,16 @@ use UniWue\UwA11yCheck\Check\ResultSet;
  */
 class ResultsService
 {
-    /**
-     * @var SerializationService
-     */
-    protected $serializationService;
+    protected SerializationService $serializationService;
 
-    /**
-     * @var PresetService
-     */
-    protected $presetService;
+    protected PresetService $presetService;
 
-    /**
-     * @param SerializationService $serializationService
-     */
-    public function injectSerializationService(\UniWue\UwA11yCheck\Service\SerializationService $serializationService)
+    public function injectSerializationService(SerializationService $serializationService): void
     {
         $this->serializationService = $serializationService;
     }
 
-    /**
-     * @param PresetService $presetService
-     */
-    public function injectPresetService(PresetService $presetService)
+    public function injectPresetService(PresetService $presetService): void
     {
         $this->presetService = $presetService;
     }
@@ -41,8 +31,7 @@ class ResultsService
      * Returns all saved results from the database. An array is returned containing both the presets and
      * the check results.
      *
-     * @param int $pid
-     * @return array
+     * @return array<int|string, array{preset: string|\UniWue\UwA11yCheck\Check\Preset, results: mixed[], date: DateTime}>
      */
     public function getResultsArrayByPid(int $pid): array
     {
@@ -55,7 +44,7 @@ class ResultsService
             ->where(
                 $queryBuilder->expr()->eq(
                     'pid',
-                    $queryBuilder->createNamedParameter($pid, \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($pid, PDO::PARAM_INT)
                 )
             )->orderBy('preset_id', 'asc');
 
@@ -73,7 +62,7 @@ class ResultsService
             $presetId = $result['preset_id'];
 
             if (!isset($dbResults[$presetId])) {
-                $checkDate = new \DateTime();
+                $checkDate = new DateTime();
                 $checkDate->setTimestamp($result['check_date']);
                 $dbResults[$presetId] = [
                     'preset' => $this->presetService->getPresetById($presetId) ?? 'Unknown',
@@ -90,9 +79,6 @@ class ResultsService
 
     /**
      * Returns the amount of saved DB check results
-     *
-     * @param int $pid
-     * @return int
      */
     public function getSavedResultsCount(int $pid): int
     {
@@ -105,7 +91,7 @@ class ResultsService
             ->where(
                 $queryBuilder->expr()->eq(
                     'pid',
-                    $queryBuilder->createNamedParameter($pid, \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($pid, PDO::PARAM_INT)
                 )
             )->orderBy('preset_id', 'asc');
 
@@ -114,8 +100,6 @@ class ResultsService
 
     /**
      * Deleted the saved result for the given PID
-     *
-     * @param int $pid
      */
     public function deleteSavedResults(int $pid): void
     {
@@ -127,7 +111,7 @@ class ResultsService
             ->where(
                 $queryBuilder->expr()->eq(
                     'pid',
-                    $queryBuilder->createNamedParameter($pid, \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($pid, PDO::PARAM_INT)
                 )
             );
 

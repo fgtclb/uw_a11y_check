@@ -2,6 +2,10 @@
 
 namespace UniWue\UwA11yCheck\Tests\Internal;
 
+use UniWue\UwA11yCheck\Check\Result\Impact;
+use DOMElement;
+use UniWue\UwA11yCheck\Check\Result\Node;
+use UniWue\UwA11yCheck\Check\Result\Status;
 use Symfony\Component\DomCrawler\Crawler;
 use UniWue\UwA11yCheck\Check\Result;
 use UniWue\UwA11yCheck\Tests\AbstractTest;
@@ -26,7 +30,7 @@ class HeadingOrderTest extends AbstractTest
     /**
      * @var int
      */
-    protected $impact = Result\Impact::MODERATE;
+    protected $impact = Impact::MODERATE;
 
     /**
      * If set, the test only checks elements in the given array of colPos ids
@@ -48,10 +52,6 @@ class HeadingOrderTest extends AbstractTest
 
     /**
      * Runs the test
-     *
-     * @param string $html
-     * @param int $fallbackElementUid
-     * @return Result
      */
     public function run(string $html, int $fallbackElementUid): Result
     {
@@ -62,10 +62,10 @@ class HeadingOrderTest extends AbstractTest
 
         $previousHeader = null;
 
-        /** @var \DOMElement $header */
+        /** @var DOMElement $header */
         foreach ($headers as $header) {
             // Always skip the first header
-            if (!$previousHeader) {
+            if ($previousHeader === null) {
                 $previousHeader = $header;
                 continue;
             }
@@ -77,19 +77,19 @@ class HeadingOrderTest extends AbstractTest
             }
 
             if (!$colPosExcluded && !HeaderUtility::headersSequentiallyDescending($previousHeader, $header)) {
-                $node = new Result\Node();
+                $node = new Node();
                 $node->setHtml($header->ownerDocument->saveHTML($header));
                 $node->setUid($this->getElementUid($header, $fallbackElementUid));
                 $result->addNode($node);
-                $result->setStatus(Result\Status::VIOLATIONS);
+                $result->setStatus(Status::VIOLATIONS);
             }
 
             $previousHeader = $header;
         }
 
         // If all found nodes passed, set status to passes
-        if ($headers->count() > 0 && count($result->getNodes()) === 0) {
-            $result->setStatus(Result\Status::PASSES);
+        if ($headers->count() > 0 && $result->getNodes() === []) {
+            $result->setStatus(Status::PASSES);
         }
 
         return $result;

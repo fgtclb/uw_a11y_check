@@ -2,6 +2,10 @@
 
 namespace UniWue\UwA11yCheck\Tests\Internal;
 
+use UniWue\UwA11yCheck\Check\Result\Impact;
+use DOMElement;
+use UniWue\UwA11yCheck\Check\Result\Node;
+use UniWue\UwA11yCheck\Check\Result\Status;
 use Symfony\Component\DomCrawler\Crawler;
 use UniWue\UwA11yCheck\Check\Result;
 use UniWue\UwA11yCheck\Tests\AbstractTest;
@@ -26,7 +30,7 @@ class LinkTextBlacklistedTest extends AbstractTest
     /**
      * @var int
      */
-    protected $impact = Result\Impact::MODERATE;
+    protected $impact = Impact::MODERATE;
 
     /**
      * @var array
@@ -50,20 +54,15 @@ class LinkTextBlacklistedTest extends AbstractTest
     /**
      * Initializes the blacklist end ensures text is lowercase
      *
-     * @param array $blacklist
-     * @return array
+     * @return string[]
      */
-    protected function initBlacklist(array $blacklist)
+    protected function initBlacklist(array $blacklist): array
     {
         return array_map('mb_strtolower', $blacklist);
     }
 
     /**
      * Runs the test
-     *
-     * @param string $html
-     * @param int $fallbackElementUid
-     * @return Result
      */
     public function run(string $html, int $fallbackElementUid): Result
     {
@@ -72,7 +71,7 @@ class LinkTextBlacklistedTest extends AbstractTest
         $crawler = new Crawler($html);
         $elements = $crawler->filter('a');
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         foreach ($elements as $element) {
             $checkResult = (LinkUtility::linkTextNotBlacklisted($element, $this->blacklist) &&
                 SharedUtility::elementAttributeValueNotBlacklisted($element, 'title', $this->blacklist) &&
@@ -83,17 +82,17 @@ class LinkTextBlacklistedTest extends AbstractTest
                 SharedUtility::elementHasRoleNone($element);
 
             if (!$checkResult) {
-                $node = new Result\Node();
+                $node = new Node();
                 $node->setHtml($element->ownerDocument->saveHTML($element));
                 $node->setUid($this->getElementUid($element, $fallbackElementUid));
                 $result->addNode($node);
-                $result->setStatus(Result\Status::VIOLATIONS);
+                $result->setStatus(Status::VIOLATIONS);
             }
         }
 
         // If all found nodes passed, set status to passes
-        if ($elements->count() > 0 && count($result->getNodes()) === 0) {
-            $result->setStatus(Result\Status::PASSES);
+        if ($elements->count() > 0 && $result->getNodes() === []) {
+            $result->setStatus(Status::PASSES);
         }
 
         return $result;
